@@ -45,13 +45,17 @@ int main(void)
 	while (1)
 	{
 		
-		PrintA( counter_playerA );
-		PrintB( counter_playerB );
+		
 		
 		if ( flag_winner != 0)
 		{
 			cli();
 			winner(flag_winner);
+		} else {
+			
+			PrintA( counter_playerA );
+			PrintB( counter_playerB );
+			
 		}
 		
 		
