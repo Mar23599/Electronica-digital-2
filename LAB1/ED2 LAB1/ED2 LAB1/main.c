@@ -8,12 +8,40 @@
 /****************************************/
 // Encabezado (Libraries)
 
-#include <avr/io.h>
-#include <avr/interrupt.h>
-
 #define PushB0 0
 #define PushB1 1
 #define PushB2 2
+#define F_CPU 16000000UL  
+
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+
+
+uint8_t display_7segmentos_[16] ={
+	
+	0x3F, // 0
+	0b00000110, // 1
+	0x6D, // 2
+	0x79, // 3
+	0x66, // 4
+	0x5B, // 5
+	0x5F, // 6
+	0x07, // 7
+	0x7F, // 8
+	0x77, // 9
+	0x77, // A
+	0x4F, // b
+	0x39, // C
+	0x5E, // d
+	0x79, // E
+	0x71  // F
+};
+
+	
+
+uint8_t race_start_flag = 0;
+	
 
 
 
@@ -21,6 +49,7 @@
 // Function prototypes
 
 void setup();
+void race_counter();
 
 /****************************************/
 // Main Function
@@ -29,10 +58,26 @@ int main(void)
 {
 	
 	setup();
-	/* Replace with your application code */
+	
+	
+	
+	
+
+	
 	while (1)
 	{
+		
+		if ( race_start_flag == 1)
+		{
+			race_counter(); // Efecutar funcione de incio de carrera
+			race_start_flag = 0; // apagar bandera de inicio de carrera
+		}
+		
+		
 	}
+	
+	
+	
 }
 
 /****************************************/
@@ -42,6 +87,8 @@ int main(void)
 void setup(){
 
 	cli(); // Desabiliar interrupciones globales
+	
+	UCSR0B &= ~((1 << TXEN0) | (1 << RXEN0));// Desabilitar UART
 	
 	// ***********************************************************************************************
 	//Configuración de pines de entrada
@@ -68,8 +115,8 @@ void setup(){
 	
 	//Interrupciones en el puerto C:
 	
-	PCICR = (1 << PCIE1) // Habilitar interrupciones del Puerto C
-	PCMSK1 = (1 << PCINT8)|(1 << PCINT9)|(1 << PCINT10) // Mascara para habilitarinterrupciones en PC0, PC1 y PC2
+	PCICR = (1 << PCIE1); // Habilitar interrupciones del Puerto C
+	PCMSK1 = (1 << PCINT8)|(1 << PCINT9)|(1 << PCINT10); // Mascara para habilitarinterrupciones en PC0, PC1 y PC2
 	
 	
 	
@@ -82,14 +129,76 @@ void setup(){
 	sei(); // Habilitar interrupciones globales
 }
 
-/****************************************/
-// Interrupt routines
 
-//Interrupciones por el puerto C
+void race_counter(){
+	
+	// Arreglo que almacena contenido de display
 
-ISR(){
+	uint8_t display_7seg[16] = {
+		
+			0x3F, // 0
+			0x06, // 1
+			0b01011011, // 2
+			0b01001111, // 3
+			0x66, // 4
+			0b01101101, // 5
+			0x5F, // 6
+			0x07, // 7
+			0x7F, // 8
+			0x77, // 9
+			0x77, // A
+			0x4F, // b
+			0x39, // C
+			0x5E, // d
+			0x79, // E
+			0x71  // F
+		};
 	
+	PORTD =0x00;	
+	PORTD = display_7seg[5]; // Imprimir 5
+	_delay_ms(1000);
 	
+	PORTD =0x00;
+	PORTD = display_7seg[4]; // Imprimir 4
+	_delay_ms(1000);
+	
+	PORTD =0x00;
+	PORTD = display_7seg[3]; // Imprimir 3
+	_delay_ms(1000);
+	
+	PORTD =0x00;
+	PORTD = display_7seg[2]; // Imprimir 2
+	_delay_ms(1000);
+	
+	PORTD =0x00;
+	PORTD = display_7seg[1]; // Imprimir 1
+	_delay_ms(1000);
+	
+	PORTD =0x00;
+	PORTD = display_7seg[0]; // Imprimir 0
+	_delay_ms(1000);
 	
 	
 }
+
+
+
+
+/****************************************/
+// Interrupt routines
+
+//Interrupciones del puerto C
+
+
+ISR(PCINT1_vect){
+	
+	if (	!(PINC & (1 << 0))	){
+		
+		race_start_flag = 1;
+		
+	}
+	
+	
+}
+
+
