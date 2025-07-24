@@ -27,7 +27,7 @@ uint8_t ADC_read(uint8_t canal ){
 		canal = 7; // En caso de escojer un canal fuera de rango, colocar como predeterminado el 7.
 	}
 	
-	ADMUX = (ADMUX & 0b11100000)|(canal & 0x07); // Seleccionar canal
+	ADMUX = (1 << REFS0) | (1 << ADLAR) | (canal & 0x07); // Seleccionar canal
 	
 	DIDR0 |= (1 << canal); // Desactivar buffer digital del canal seleccionado
 	

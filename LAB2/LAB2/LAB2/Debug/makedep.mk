@@ -6,5 +6,7 @@ Ale-Lib-ADC.c
 
 Ale-lib-LCD8.c
 
+Ale-lib-UART.c
+
 main.c
 
