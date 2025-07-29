@@ -10,6 +10,8 @@
 #include <avr/delay.h>
 #include <stdio.h>
 #include "Ale-lib-UART.h"
+#include "Ale-lib-LCD8.h"
+#include "Ale-Lib-ADC.h"
 
 #define F_CPU 16000000
 
