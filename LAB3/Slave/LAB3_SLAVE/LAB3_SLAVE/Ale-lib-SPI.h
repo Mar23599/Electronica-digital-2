@@ -22,7 +22,7 @@ typedef enum {
 	MS_OSC_DIV32 = 0b01010100,
 	MS_OSC_DIV64 = 0b01010101,
 	MS_OSC_DIV128 = 0b01010110,
-	SLAVE_SS = 0b01000000
+	SLAVE_SS = 0b00000000
 	
 	} SPI_type ;
 	
@@ -47,10 +47,20 @@ typedef enum {
 	
 	} SPI_clock_phase ;
 	
+typedef enum {
+	
+	SS_ENEBLE = 0,
+	SS_DISABLE = 1
+	
+} SPI_SS_CONTROL; 
+
+	
 
 void SPI_init (SPI_type, SPI_data_order, SPI_clock_pol, SPI_clock_phase);
 void SPI_Write (uint8_t data);
 uint8_t SPI_Read(void);
+
+void SPI_SS_control(SPI_SS_CONTROL controlador); 
 
 
 

@@ -78,7 +78,7 @@ void SPI_init (SPI_type TYPE, SPI_data_order DATA_ORDER, SPI_clock_pol CLOCK_POL
 		
 		//SLAVE MODE
 		
-		DDRB |= (1 << PORTB); // MISO
+		DDRB |= (1 << PORTB4); // MISO
 		DDRB &= ~(	(1 << PORTB3)|(1 << PORTB5)|(1 << PORTB2)	); // MOSI, SCK, SS
 		
 	}
@@ -100,5 +100,25 @@ uint8_t SPI_Read(void){
 	
 	while (	!(SPSR & (1 << SPIF))	);
 	return (SPDR);
+}
+
+
+void SPI_SS_control(SPI_SS_CONTROL controlador){
+	
+	
+	switch (controlador){
+		
+	case SS_ENEBLE: PORTB &= ~(1 << PORTB2); // Encender SS
+	break;
+	
+	case SS_DISABLE: PORTB |= (1 << PORTB2); // Apagar SS
+	break;
+	
+	default: PORTB &= ~(1 << PORTB2); // Por default encender
+	break;
+		
+	}
+	
+	
 }
 

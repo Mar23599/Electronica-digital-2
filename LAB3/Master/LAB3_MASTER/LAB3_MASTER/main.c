@@ -18,7 +18,7 @@
 #include "Ale-lib-UART.h"
 
 
-uint8_t data_s;
+uint8_t data_r; // Dato recivido
 
 /****************************************/
 // Function prototypes
@@ -33,19 +33,23 @@ int main(void)
 	
 	setup();
 	
+	UART_SendString("Inicio \n");
+	
 	
 	while (1)
 	{
-		PORTB &= ~(1 << PORTB2); //SS E = 1
 		
-		SPI_Write('c');
-		data_s = SPI_Read();
+		SPI_SS_CONTROL(SS_ENEBLE);
+		SPI_Write('A');
+		UART_SendString("PRUEBA1");
+		data_r = SPI_Read();
+		UART_SendString("PRUEBA2");
+		SPI_SS_CONTROL(SS_DISABLE);
+		
+		UART_SendString("Se recibio: ");
+		UART_SendChar(data_r);
 		UART_SendString("\n");
-		UART_SendChar(data_s);
 		
-		PORTB |= (1 << PORTB2); //SS E = 0
-		
-		_delay_ms(500);
 		
 		
 	}
@@ -60,6 +64,7 @@ void setup(){
 	cli();
 	
 	SPI_init(MS_OSC_DIV16, DATA_ORDER_MSB, CLK_LOW, CLK_FIRST_EDGE);
+	SPCR |= (1 << SPIE); // HABILITAR INTERRUPCIONES DEL SPI
 	UART_init();
 	
 	sei();
@@ -68,3 +73,11 @@ void setup(){
 
 /****************************************/
 // Interrupt routines
+
+
+ISR(SPI_STC_vect){
+	
+
+	
+	
+}
