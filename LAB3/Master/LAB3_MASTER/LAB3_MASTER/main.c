@@ -64,7 +64,6 @@ void setup(){
 	cli();
 	
 	SPI_init(MS_OSC_DIV16, DATA_ORDER_MSB, CLK_LOW, CLK_FIRST_EDGE);
-	SPCR |= (1 << SPIE); // HABILITAR INTERRUPCIONES DEL SPI
 	UART_init();
 	
 	sei();

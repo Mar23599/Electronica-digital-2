@@ -221,7 +221,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x28e
+.text           0x00000000      0x288
  *(.vectors)
  .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
                 0x00000000                __vector_default
@@ -327,20 +327,20 @@ END GROUP
  .text.UART_SendString
                 0x000001ea       0x1e Ale-lib-UART.o
                 0x000001ea                UART_SendString
- .text.setup    0x00000208       0x1c main.o
+ .text.setup    0x00000208       0x16 main.o
                 0x00000208                setup
- .text.main     0x00000224       0x46 main.o
-                0x00000224                main
+ .text.main     0x0000021e       0x46 main.o
+                0x0000021e                main
  .text.__vector_17
-                0x0000026a       0x14 main.o
-                0x0000026a                __vector_17
- .text.libgcc   0x0000027e        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
-                0x0000027e                __tablejump2__
-                0x0000028a                . = ALIGN (0x2)
+                0x00000264       0x14 main.o
+                0x00000264                __vector_17
+ .text.libgcc   0x00000278        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                0x00000278                __tablejump2__
+                0x00000284                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000028a        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x0000028a                _exit
-                0x0000028a                exit
+ .fini9         0x00000284        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00000284                _exit
+                0x00000284                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -359,11 +359,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000028a        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00000284        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000028e                _etext = .
+                0x00000288                _etext = .
 
-.data           0x00800100       0x26 load address 0x0000028e
+.data           0x00800100       0x26 load address 0x00000288
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -386,8 +386,8 @@ END GROUP
  COMMON         0x00800126        0x1 main.o
                 0x00800126                data_r
                 0x00800127                PROVIDE (__bss_end, .)
-                0x0000028e                __data_load_start = LOADADDR (.data)
-                0x000002b4                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000288                __data_load_start = LOADADDR (.data)
+                0x000002ae                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800127        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -486,12 +486,12 @@ END GROUP
  .debug_abbrev  0x00000675       0xa6 Ale-lib-UART.o
  .debug_abbrev  0x0000071b      0x122 main.o
 
-.debug_line     0x00000000      0x5a8
+.debug_line     0x00000000      0x5a2
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x134 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_line    0x00000134      0x204 Ale-lib-SPI.o
  .debug_line    0x00000338      0x12d Ale-lib-UART.o
- .debug_line    0x00000465      0x143 main.o
+ .debug_line    0x00000465      0x13d main.o
 
 .debug_frame    0x00000000       0xf4
  *(.debug_frame)
