@@ -99,16 +99,7 @@ void AHT10_Debug_ReadRaw(void);
 void DisplayMeasurements(float temp, float hum);
 void AHT10_OutString(void);
 
-//Funciones de TSL2561
 
-uint8_t TSL2561_Init(void);
-uint8_t TSL2561_ReadRawData(uint16_t *ch0, uint16_t *ch1);
-float TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1);
-uint8_t TSL2561_ReadLux(float *lux);
-void DisplayLightData(float lux, uint16_t ch0, uint16_t ch1);
-
-void DebugLuxCalculation(uint16_t ch0, uint16_t ch1);
-void TSL2561_DebugFull(void); // Debug
 
 
 void I2C_Scanner(void);
@@ -129,19 +120,7 @@ int main(void)
 
 		AHT10_OutString(); //LEctura de la humedad en formato Hxx.xH
         
-	        // DEBUG COMPLETO del TSL2561 (temporal)
-	        UART_SendString("=== DEBUG TSL2561 ===\n");
-	        TSL2561_DebugFull();
-	        
-	        float luz_actual;
-	        if (TSL2561_ReadLux(&luz_actual)) {
-		        char lux_msg[30];
-		        sprintf(lux_msg, "LUX CALCULADO: %.1f\n", luz_actual);
-		        UART_SendString(lux_msg);
-		        
-		        // Mostrar en formato final
-		        DisplayLightData(luz_actual, ch0_value, ch1_value);
-	        }
+	    
 			
 			
 			_delay_ms(2000);
@@ -177,13 +156,7 @@ void setup(){
 		UART_SendString("Sensor AHT10: ERROR \n");
 	}
 	
-	//Inicializacion de TSL2561
-	if (TSL2561_Init() == 1)
-	{
-		UART_SendString("Sensor TSL2561 inicializado correctamente \n");
-		} else {
-		UART_SendString("Sensor TSL2561: ERROR \n");
-	}	
+	
 	
 	
 	
@@ -195,225 +168,7 @@ void setup(){
 
 //--------------------------FUNCIONES TSL2561------------------------------------
 
-uint8_t TSL2561_Init(void){
-	uint8_t id;
-	
-	// Leer ID del sensor para verificar comunicación
-	if (!I2C_Read_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_ID, &id)) {
-		UART_SendString("TSL2561: Error leyendo ID\n");
-		return 0;
-	}
-	
-	// Verificar que es un TSL2561 (ID debería ser 0x50, 0x30 o 0x00)
-	if ((id != 0x50) && (id != 0x30) && (id != 0x00)) {
-		char msg[50];
-		sprintf(msg, "TSL2561: ID invalido 0x%02X\n", id);
-		UART_SendString(msg);
-		return 0;
-	}
-	
-	// Configurar timing: 402ms, ganancia 1x
-	uint8_t timing = TSL2561_INTEGRATION_402MS | TSL2561_GAIN_1X;
-	if (!I2C_Write_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_TIMING, timing)) {
-		UART_SendString("TSL2561: Error configurando timing\n");
-		return 0;
-	}
-	
-	// Encender el sensor
-	if (!I2C_Write_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_CONTROL, 0x03)) {
-		UART_SendString("TSL2561: Error encendiendo sensor\n");
-		return 0;
-	}
-	
-	UART_SendString("TSL2561: Inicializado correctamente\n");
-	return 1;
-}
 
-
-uint8_t TSL2561_ReadRawData(uint16_t *ch0, uint16_t *ch1){
-	uint8_t data[4];
-	
-	// Leer 4 bytes: CH0 low, CH0 high, CH1 low, CH1 high
-	if (!I2C_Read_Multiple(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_DATA0LOW, data, 4)) {
-		UART_SendString("TSL2561: Error leyendo datos\n");
-		return 0;
-	}
-	
-	// Combinar bytes para formar valores de 16 bits
-	*ch0 = (data[1] << 8) | data[0];  // Canal 0 (full spectrum)
-	*ch1 = (data[3] << 8) | data[2];  // Canal 1 (IR)
-	
-	return 1;
-}
-
-float TSL2561_CalculateLux(uint16_t ch0, uint16_t ch1) {
-	float ratio, lux;
-	
-	if (ch0 == 0) {
-		UART_SendString("CALC: ch0=0, returning 0\n");
-		return 0.0;
-	}
-	
-	ratio = (float)ch1 / (float)ch0;
-	
-	// Debug del ratio
-	char ratio_msg[30];
-	sprintf(ratio_msg, "CALC: Ratio=%.3f\n", ratio);
-	UART_SendString(ratio_msg);
-	
-	// Algoritmo de cálculo
-	if (ratio <= 0.50f) {
-		float ratio_power = ratio * ratio * sqrt(ratio);
-		lux = (0.0304f * ch0) - (0.062f * ch0 * ratio_power);
-		UART_SendString("CALC: Using case 1 (ratio <= 0.50)\n");
-	}
-	else if (ratio <= 0.61f) {
-		lux = (0.0224f * ch0) - (0.031f * ch1);
-		UART_SendString("CALC: Using case 2 (ratio <= 0.61)\n");
-	}
-	else if (ratio <= 0.80f) {
-		lux = (0.0128f * ch0) - (0.0153f * ch1);
-		UART_SendString("CALC: Using case 3 (ratio <= 0.80)\n");
-	}
-	else if (ratio <= 1.30f) {
-		lux = (0.00146f * ch0) - (0.00112f * ch1);
-		UART_SendString("CALC: Using case 4 (ratio <= 1.30)\n");
-	}
-	else {
-		lux = 0.0f;
-		UART_SendString("CALC: Ratio out of range, returning 0\n");
-	}
-	
-	return lux;
-}
-
-uint8_t TSL2561_ReadLux(float *lux) {
-	uint16_t ch0, ch1;
-	
-	if (!TSL2561_ReadRawData(&ch0, &ch1)) {
-		return 0;
-	}
-	
-	// DEBUG: Mostrar valores crudos
-	char debug_msg[50];
-	sprintf(debug_msg, "RAW: CH0=%u, CH1=%u\n", ch0, ch1);
-	UART_SendString(debug_msg);
-	
-	// Calcular lux
-	*lux = TSL2561_CalculateLux(ch0, ch1);
-	
-	// Guardar en variables globales
-	ch0_value = ch0;
-	ch1_value = ch1;
-	lux_value = *lux;
-	
-	return 1;
-}
-
-void DisplayLightData(float lux, uint16_t ch0, uint16_t ch1) {
-	char buffer[20];
-	
-	// Formato simplificado: "Lxxxxxx.xL" (ej: "L00123.4L")
-	// 6 dígitos enteros + 1 decimal = total 9 caracteres numéricos
-	
-	// Verificar si el valor es válido
-	if (lux < 0) {
-		UART_SendString("L000000.0L\n");  // Valor por defecto para errores
-		return;
-	}
-	
-	// Formatear con 6 enteros y 1 decimal
-	sprintf(buffer, "L%06.1fL\n", lux);
-	UART_SendString(buffer);
-	
-	// Los parámetros ch0 y ch1 se reciben pero no se muestran
-	// Se mantienen por si necesitas usarlos para debugging interno
-}
-
-//Funcion de debug 
-
-void DebugLuxCalculation(uint16_t ch0, uint16_t ch1) {
-	char debug_msg[80];
-	
-	if (ch0 == 0) {
-		sprintf(debug_msg, "DEBUG: C0=%u, C1=%u, Ratio=UNDEF (ch0=0)\n", ch0, ch1);
-		} else {
-		float ratio_val = (float)ch1 / (float)ch0;
-		sprintf(debug_msg, "DEBUG: C0=%u, C1=%u, Ratio=%.3f\n", ch0, ch1, ratio_val);
-	}
-	
-	UART_SendString(debug_msg);
-}
-
-//otra funcion de debug
-
-void TSL2561_DebugFull(void) {
-	uint8_t data[6];
-	char debug_msg[100];
-	
-	// 1. Leer registro de CONTROL para ver estado de poder
-	uint8_t control_reg;
-	if (I2C_Read_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_CONTROL, &control_reg)) {
-		sprintf(debug_msg, "CONTROL REG: 0x%02X", control_reg);
-		UART_SendString(debug_msg);
-		if (control_reg & 0x03) UART_SendString(" (POWER ON)");
-		else UART_SendString(" (POWER OFF)");
-		UART_SendString("\n");
-	}
-	
-	// 2. Leer registro de TIMING para ver configuración
-	uint8_t timing_reg;
-	if (I2C_Read_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_TIMING, &timing_reg)) {
-		sprintf(debug_msg, "TIMING REG: 0x%02X", timing_reg);
-		UART_SendString(debug_msg);
-		
-		// Decodificar ganancia
-		if (timing_reg & 0x10) UART_SendString(" GAIN=16X");
-		else UART_SendString(" GAIN=1X");
-		
-		// Decodificar tiempo de integración
-		switch(timing_reg & 0x03) {
-			case 0: UART_SendString(" TIME=13ms"); break;
-			case 1: UART_SendString(" TIME=101ms"); break;
-			case 2: UART_SendString(" TIME=402ms"); break;
-			default: UART_SendString(" TIME=invalid"); break;
-		}
-		UART_SendString("\n");
-	}
-	
-	// 3. Leer registro ID para verificar sensor
-	uint8_t id_reg;
-	if (I2C_Read_Register(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_ID, &id_reg)) {
-		sprintf(debug_msg, "ID REG: 0x%02X", id_reg);
-		UART_SendString(debug_msg);
-		
-		// Verificar ID válido
-		if (id_reg == 0x50 || id_reg == 0x30 || id_reg == 0x00) {
-			UART_SendString(" (TSL2561 VALIDO)\n");
-			} else {
-			sprintf(debug_msg, " (ID INVALIDO, esperaba 0x50, 0x30 o 0x00)\n");
-			UART_SendString(debug_msg);
-		}
-	}
-	
-	// 4. Leer datos crudos directamente
-	if (I2C_Read_Multiple(TSL2561_ADDRESS, TSL2561_CMD | TSL2561_REG_DATA0LOW, data, 4)) {
-		uint16_t ch0 = (data[1] << 8) | data[0];
-		uint16_t ch1 = (data[3] << 8) | data[2];
-		
-		sprintf(debug_msg, "DATOS CRUDOS: CH0=%u, CH1=%u\n", ch0, ch1);
-		UART_SendString(debug_msg);
-		
-		// Verificar si los datos son válidos
-		if (ch0 == 0 && ch1 == 0) {
-			UART_SendString("ERROR: Ambos canales en 0 - Verificar conexión\n");
-			} else if (ch0 == 65535 || ch1 == 65535) {
-			UART_SendString("ERROR: Sensor saturado o valores máximos\n");
-		}
-	}
-	
-	UART_SendString("----------------\n");
-}
 
 
 //--------------------------FUNCIONES AHT10--------------------------------------
@@ -731,7 +486,7 @@ void AHT10_Debug_ReadRaw(void)
 	uint32_t raw_temp, raw_hum;
 	
 	if (AHT10_ReadRawData(&raw_temp, &raw_hum)) {
-		char debug_msg[100];
+		char debug_msg[40];
 		
 		// Mostrar datos crudos
 		//sprintf(debug_msg, "Datos crudos - Hum: %lu (%06lX), Temp: %lu (%06lX)\n",
