@@ -19,7 +19,7 @@
 #define AHT10_ADDRESS 0x38
 #define TSL2561_ADDRESS 0x39
 #define SLAVE_ADDRESS 0x40
-#define  SLAVE_ADDRESS_MOTORS 0x050
+#define  SLAVE_ADDRESS_MOTORS 0x41
 #define FILTER_SAMPLES 5
 
 // Comandos para AHT10
@@ -51,6 +51,11 @@ SystemStatus system_status = {0};
 float humidity_history[FILTER_SAMPLES];
 uint8_t history_index = 0;
 
+//Variables para comandos de motores
+volatile uint8_t serial_command = 0; // Guarda el comando recibido
+volatile uint8_t command_ready = 0; // bandera de estado
+
+
 // Prototipos de funciones
 void System_Init(void);
 void Sensor_Init(void);
@@ -79,9 +84,22 @@ void DisplayLight(float lux);
 float ReadSlaveTemperature(void);
 void SendSensorDataToESP(float temp, float hum, float lux);
 
+void I2C_Scanner(void); // Para debug
+
+//Funciones de manejo de motores
+
+void process_serial_command(void);
+uint8_t I2C_Send_Command(uint8_t command);
+const char* I2C_Status_Message(uint8_t status);
+
 int main(void) {
    cli();
+   _delay_ms(2000);
     System_Init();
+	
+	I2C_Scanner();
+	
+	
 	sei();
 	
     Main_Loop();
@@ -210,7 +228,12 @@ void Main_Loop(void) {
         if(current_temp > -40) DisplayTemperature(current_temp);
         if(current_lux >= 0) DisplayLight(current_lux);
 
-        
+
+		// Envio de comandos de motores
+        if (command_ready) {
+	        process_serial_command();
+	        command_ready = 0;
+             }
 
         _delay_ms(1000);
     }
@@ -600,4 +623,154 @@ void SendSensorDataUART(float humidity, float temperature, float lux) {
 	UART_SendChar('\n'); // Fin del mensaje
 }
 
+//-------------------------Envio de comandos a motores---------------------
 
+uint8_t I2C_Send_Command(uint8_t command)
+{
+	uint8_t status;
+	
+	// Iniciar comunicación I2C
+	I2C_Master_Start();
+	
+	// Enviar dirección del esclavo + bit de escritura (0)
+	status = I2C_Master_Write((SLAVE_ADDRESS_MOTORS << 1) | 0x00);
+	
+	if (status != 1) {
+		// Error en el envío de la dirección
+		I2C_Master_Stop();
+		return status;
+	}
+	
+	// Enviar comando
+	status = I2C_Master_Write(command);
+	
+	// Finalizar comunicación I2C
+	I2C_Master_Stop();
+	
+	return status;
+}
+
+void process_serial_command(void)
+{
+	uint8_t i2c_status;
+	
+	switch (serial_command) {
+		case 'A':
+		case 'a':
+		UART_SendString("Encendiendo PD6... ");
+		i2c_status = I2C_Send_Command('A');
+		UART_SendString(I2C_Status_Message(i2c_status));
+		UART_SendString("\r\n");
+		break;
+		
+		case 'B':
+		case 'b':
+		UART_SendString("Apagando PD6... ");
+		i2c_status = I2C_Send_Command('B');
+		UART_SendString(I2C_Status_Message(i2c_status));
+		UART_SendString("\r\n");
+		break;
+		
+		case 'C':
+		case 'c':
+		UART_SendString("Encendiendo PB0... ");
+		i2c_status = I2C_Send_Command('C');
+		UART_SendString(I2C_Status_Message(i2c_status));
+		UART_SendString("\r\n");
+		break;
+		
+		case 'D':
+		case 'd':
+		UART_SendString("Apagando PB0... ");
+		i2c_status = I2C_Send_Command('D');
+		UART_SendString(I2C_Status_Message(i2c_status));
+		UART_SendString("\r\n");
+		break;
+		
+		case '?':
+		case 'h':
+		// Mostrar ayuda
+		UART_SendString("=== COMANDOS ===\r\n");
+		UART_SendString("A - Encender PB5\r\n");
+		UART_SendString("B - Apagar PB5\r\n");
+		UART_SendString("C - Encender PB0\r\n");
+		UART_SendString("D - Apagar PB0\r\n");
+		UART_SendString("? - Mostrar ayuda\r\n");
+		break;
+		
+		case '\r': // Enter
+		case '\n': // Nueva línea
+		// Ignorar caracteres de control
+		break;
+		
+		default:
+		// Comando no reconocido
+		UART_SendString("Comando no valido: ");
+		UART_SendChar(serial_command);
+		UART_SendString("\r\nUsar: A, B, C, D, ?\r\n");
+		break;
+	}
+}
+
+const char* I2C_Status_Message(uint8_t status)
+{
+	switch (status) {
+		case 1: return "OK - Esclavo recibio el comando";
+		case 0x08: return "START transmitido";
+		case 0x10: return "REPEATED START transmitido";
+		case 0x18: return "SLA+W transmitido, ACK recibido";
+		case 0x20: return "SLA+W transmitido, NACK recibido";
+		case 0x28: return "Dato transmitido, ACK recibido";
+		case 0x30: return "Dato transmitido, NACK recibido";
+		case 0x38: return "Arbitration perdido en SLA+W o dato";
+		case 0x40: return "SLA+R transmitido, ACK recibido";
+		case 0x48: return "SLA+R transmitido, NACK recibido";
+		default: return "Estado desconocido";
+	}
+}
+
+void I2C_Scanner(void) {
+	
+	uint8_t error, address;
+	uint8_t devices_found = 0;
+	
+    UART_SendString("\r\nEscaneando bus I2C...\r\n");
+    UART_SendString("Direccion   Estado\r\n");
+    UART_SendString("------------------\r\n");
+    
+    for (address = 1; address < 127; address++) {
+	    // Enviar condición de START
+	    I2C_Master_Start();
+	    
+	    // Intentar escribir a la dirección (SLA+W)
+	    error = I2C_Master_Write((address << 1) | 0x00);
+	    
+	    // Enviar condición de STOP
+	    I2C_Master_Stop();
+	    
+	    // Si no hay error, el dispositivo respondió
+	    if (error == 1) {
+		    char buffer[20];
+		    // Formatear la dirección para mostrar
+		    sprintf(buffer, "0x%02X       Encontrado\r\n", address);
+		    UART_SendString(buffer);
+		    devices_found++;
+	    }
+    }
+    
+    // Mostrar resumen del escaneo
+    char summary[50];
+    sprintf(summary, "\r\nEscaneo completado. Dispositivos encontrados: %d\r\n", devices_found);
+    UART_SendString(summary);
+}
+
+//------------------RUTINAS DE INTERRUPCION-------------------------
+
+ISR(USART_RX_vect)
+{
+	// Leer el dato recibido
+	serial_command = UDR0;
+	
+	// Marcar que hay un comando listo para procesar
+	command_ready = 1;
+}
