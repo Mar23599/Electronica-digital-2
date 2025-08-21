@@ -42,11 +42,8 @@
 
 //Variables del AHT10
 
-float current_temp = 0.0;
-float current_hum = 0.0;
-
-float temperatura_read = 0.0;
-float humedad_read = 0.0;
+uint16_t current_temp_scaled = 0;
+uint16_t current_hum_scaled = 0;
 
 
 //--------------TSL2561---------------------------
@@ -91,18 +88,44 @@ void setup();
 //Funciones de AHT10
 uint8_t AHT10_Init(void);
 uint8_t AHT10_ReadRawData(uint32_t *raw_temp, uint32_t *raw_hum);
-uint8_t AHT10_ReadMeasurements(float *temperature, float *humidity);
+uint8_t AHT10_ReadMeasurements(uint16_t *temperature_scaled, uint16_t *humidity_scaled);
 uint8_t AHT10_SoftReset(void);
 uint8_t AHT10_GetStatus(uint8_t *status);
 uint8_t AHT10_ReadStatusByte(uint8_t *status); 
 void AHT10_Debug_ReadRaw(void);
-void DisplayMeasurements(float temp, float hum);
+void DisplayMeasurements(uint16_t temp_scaled, uint16_t hum_scaled);
 void AHT10_OutString(void);
 
-
-
-
+//Funciones de utilidad
+void uint16_to_str(uint16_t value, char* buffer, uint8_t decimal_places);
+void send_hex_byte(uint8_t byte);
+void send_decimal(uint16_t value, uint8_t decimal_places);
 void I2C_Scanner(void);
+// Función auxiliar para mostrar 24 bits en hex
+void send_hex_24bit(uint32_t value);
+
+void debug_raw_values(void) {
+	uint32_t raw_temp, raw_hum;
+	
+	if (AHT10_ReadRawData(&raw_temp, &raw_hum)) {
+		UART_SendString("DEBUG - Raw Humidity: ");
+		// Función para enviar número decimal de 32 bits
+		send_uint32(raw_hum);
+		UART_SendString("\n");
+		
+		UART_SendString("DEBUG - Raw Temperature: ");
+		send_uint32(raw_temp);
+		UART_SendString("\n");
+		
+		UART_SendString("DEBUG - Hex Humidity: 0x");
+		send_hex_24bit(raw_hum);
+		UART_SendString("\n");
+		
+		UART_SendString("DEBUG - Hex Temperature: 0x");
+		send_hex_24bit(raw_temp);
+		UART_SendString("\n");
+	}
+}
 
 /****************************************/
 // Main Function
@@ -111,7 +134,7 @@ int main(void)
 {
 	
 	setup();
-	
+	debug_raw_values();
 	
 	
 	while (1)
@@ -175,19 +198,11 @@ void setup(){
 
 void AHT10_OutString(void){
 	
-        // Primero debug: leer datos crudos
-        //UART_SendString("Leyendo datos crudos...\n");
-        // AHT10_Debug_ReadRaw();
-        
-        // Luego intentar medición normal
-        if (AHT10_ReadMeasurements(&current_temp, &current_hum))
-        {
-	        // Mostrar mediciones en UART
-	        DisplayMeasurements(current_temp, current_hum);
-	        
-        }
-	
-	
+	//Desplegar lectura de humedad
+	if (AHT10_ReadMeasurements(&current_temp_scaled, &current_hum_scaled))
+	{
+		DisplayMeasurements(current_temp_scaled, current_hum_scaled);
+	}
 }
 
 uint8_t AHT10_Init(void)
@@ -203,13 +218,12 @@ uint8_t AHT10_Init(void)
 	}
 	
 	UART_SendString("INIT: Estado inicial: 0x");
-	char buf[10];
-	sprintf(buf, "%02X\n", status);
-	UART_SendString(buf);
+	send_hex_byte(status);
+	UART_SendString("\n");
 	
 	// Si ya está calibrado, no necesitamos inicializar
 	if (status & AHT10_STATUS_CALIB) {
-		UART_SendString("INIT: SENSOR YA CALIBRADO - Saltando inicialización\n");
+		UART_SendString("INIT: SENSOR YA CALIBRADO - Saltando inicializacion\n");
 		return 1;
 	}
 	
@@ -229,21 +243,18 @@ uint8_t AHT10_Init(void)
 	}
 	
 	UART_SendString("INIT: Estado post-reset: 0x");
-	sprintf(buf, "%02X\n", status);
-	UART_SendString(buf);
+	send_hex_byte(status);
+	UART_SendString("\n");
 	
 	// Si ya está calibrado después del reset, perfecto
 	if (status & AHT10_STATUS_CALIB) {
-		UART_SendString("INIT: SENSOR CALIBRADO DESPUÉS DE RESET\n");
+		UART_SendString("INIT: SENSOR CALIBRADO DESPUES DE RESET\n");
 		return 1;
 	}
 	
-	UART_SendString("INIT: Intentando comando de calibración alternativo...\n");
+	UART_SendString("INIT: Intentando comando de calibracion alternativo...\n");
 	
 	// ALTERNATIVA: Usar método directo de registro
-	// Algunos AHT10 prefieren este enfoque
-	
-	// Escribir al registro de configuración (0xE1 no es el único comando)
 	if (!I2C_Write_Register(AHT10_ADDRESS, 0xE1, 0x08)) {
 		UART_SendString("INIT: ERROR ESCRIBIENDO REGISTRO 0xE1\n");
 		return 0;
@@ -257,7 +268,7 @@ uint8_t AHT10_Init(void)
 		return 0;
 	}
 	
-	UART_SendString("INIT: Comando de calibración enviado, esperando...\n");
+	UART_SendString("INIT: Comando de calibracion enviado, esperando...\n");
 	_delay_ms(300); // Espera para calibración
 	
 	// Verificar calibración
@@ -267,7 +278,7 @@ uint8_t AHT10_Init(void)
 		timeout++;
 		
 		if (timeout > 100) {
-			UART_SendString("INIT: TIMEOUT EN CALIBRACIÓN\n");
+			UART_SendString("INIT: TIMEOUT EN CALIBRACION\n");
 			return 0;
 		}
 		
@@ -279,25 +290,63 @@ uint8_t AHT10_Init(void)
 	} while (status & AHT10_STATUS_BUSY);
 	
 	UART_SendString("INIT: Estado final: 0x");
-	sprintf(buf, "%02X\n", status);
-	UART_SendString(buf);
+	send_hex_byte(status);
+	UART_SendString("\n");
 	
 	if ((status & AHT10_STATUS_CALIB) == 0) {
 		UART_SendString("INIT: SENSOR NO SE PUDO CALIBRAR\n");
 		
-		// ÚLTIMO INTENTO: Leer medición directamente
+		// ÚLTIMO INTENTO: Leer medición directamente (SIN FLOATS)
 		UART_SendString("INIT: Intentando lectura directa...\n");
-		float temp, hum;
-		if (AHT10_ReadMeasurements(&temp, &hum)) {
+		uint16_t temp_scaled, hum_scaled;
+		if (AHT10_ReadMeasurements(&temp_scaled, &hum_scaled)) {
 			UART_SendString("INIT: LECTURA DIRECTA EXITOSA - Sensor funciona!\n");
+			
+			// Mostrar valores leídos para debug
+			UART_SendString("INIT: Temp: ");
+			send_decimal(temp_scaled, 2);
+			UART_SendString("C, Hum: ");
+			send_decimal(hum_scaled, 2);
+			UART_SendString("%\n");
+			
 			return 1;
 		}
 		
 		return 0;
 	}
 	
-	UART_SendString("INIT: CALIBRACIÓN EXITOSA!\n");
+	UART_SendString("INIT: CALIBRACION EXITOSA!\n");
 	return 1;
+}
+
+// Función auxiliar para enviar números decimales
+void send_decimal(uint16_t value_scaled, uint8_t decimal_places) {
+	char buffer[6];
+	
+	// Parte entera
+	uint16_t integer_part = value_scaled / 100;
+	uint16_t decimal_part = value_scaled % 100;
+	
+	// Convertir parte entera
+	uint16_to_str(integer_part, buffer, 0);
+	UART_SendString(buffer);
+	
+	UART_SendString(".");
+	
+	// Convertir parte decimal con leading zeros
+	if (decimal_places == 2) {
+		if (decimal_part < 10) {
+			UART_SendString("0");
+		}
+		uint16_to_str(decimal_part, buffer, 0);
+		UART_SendString(buffer);
+		} else if (decimal_places == 1) {
+		// Solo un decimal
+		uint8_t first_decimal = decimal_part / 10;
+		buffer[0] = '0' + first_decimal;
+		buffer[1] = '\0';
+		UART_SendString(buffer);
+	}
 }
 
 uint8_t AHT10_ReadRawData(uint32_t *raw_temp, uint32_t *raw_hum)
@@ -314,7 +363,7 @@ uint8_t AHT10_ReadRawData(uint32_t *raw_temp, uint32_t *raw_hum)
 	// Enviar comando de trigger (3 bytes)
 	for (uint8_t i = 0; i < 3; i++) {
 		if (!I2C_Master_Write(trigger_cmd[i])) {
-		//	UART_SendString("Error: I2C Write failed\n");
+			UART_SendString("Error: I2C Write failed\n");
 			I2C_Master_Stop();
 			return 0;
 		}
@@ -371,33 +420,28 @@ uint8_t AHT10_ReadRawData(uint32_t *raw_temp, uint32_t *raw_hum)
 
 // Función para leer mediciones convertidas a valores reales
 
-uint8_t AHT10_ReadMeasurements(float *temperature, float *humidity) {
-	uint32_t raw_temp, raw_hum;  // Variables para datos crudos del sensor
+uint8_t AHT10_ReadMeasurements(uint16_t *temperature_scaled, uint16_t *humidity_scaled) {
+	uint32_t raw_temp, raw_hum;
 	
-	// Leer datos crudos del sensor AHT10
 	if (!AHT10_ReadRawData(&raw_temp, &raw_hum)) {
-		return 0;  // Retorna 0 si hay error en la lectura
+		return 0;
 	}
 	
-	// CONVERSIÓN DE HUMEDAD (según datasheet AHT10)
-	// Fórmula: Humedad = (raw_hum / 2^20) * 100%
-	// Se usa aritmética entera primero para mayor precisión
-	uint32_t hum_calc = (raw_hum * 10000UL) / 1048576UL;  // 1048576 = 2^20
-	*humidity = hum_calc / 100.0f;  // Convertir a float con un decimal
+	// CONVERSIÓN SIN FLOATS - usando aritmética entera
+	// Humedad: (raw_hum * 10000) / 1048576 (escalado x100)
+	*humidity_scaled = (raw_hum * 10000UL) / 1048576UL;
 	
-	// GUARDAR EN VARIABLE GLOBAL - Esto permite acceso desde cualquier función
-	humedad_read = *humidity;  // humedad_read ahora contiene el último valor medido
+	// Temperatura: ((raw_temp * 20000) / 1048576) - 5000 (escalado x100)
+	// Cálculo en dos pasos para evitar overflow
+	uint32_t temp_calc = (raw_temp * 20000UL) / 1048576UL;
+	if (temp_calc >= 5000) {
+		*temperature_scaled = temp_calc - 5000;
+		} else {
+		// Manejo de valores negativos (raro pero posible)
+		*temperature_scaled = 0;
+	}
 	
-	// CONVERSIÓN DE TEMPERATURA (según datasheet AHT10)
-	// Fórmula: Temperatura = (raw_temp / 2^20) * 200 - 50
-	// Se hace en float para evitar problemas de overflow
-	float temp_calc_float = ((float)raw_temp / 1048576.0f) * 200.0f - 50.0f;
-	*temperature = temp_calc_float;
-	
-	// GUARDAR EN VARIABLE GLOBAL
-	temperatura_read = *temperature;  // temperatura_read contiene el último valor medido
-	
-	return 1;  // Retorna 1 indicando lectura exitosa
+	return 1;
 }
 
 
@@ -454,6 +498,116 @@ uint8_t AHT10_GetStatus(uint8_t *status) {
 	return 1; // Lectura exitosa
 }
 
+
+//Funcion para lectura de estado del AHT10
+uint8_t AHT10_ReadStatusByte(uint8_t *status) {
+	if (!I2C_Master_Start(AHT10_ADDRESS, 1)) { // 1 para lectura
+		return 0; // Error
+	}
+	*status = I2C_Master_Read(0); // 0 para NACK
+	I2C_Master_Stop();
+	return 1; // Éxito
+}
+
+void AHT10_Debug_ReadRaw(void) {
+	uint32_t raw_temp, raw_hum;
+	
+	if (AHT10_ReadRawData(&raw_temp, &raw_hum)) {
+		// Mostrar datos crudos en hex
+		UART_SendString("Humedad cruda: 0x");
+		send_hex_byte((raw_hum >> 16) & 0xFF);
+		send_hex_byte((raw_hum >> 8) & 0xFF);
+		send_hex_byte(raw_hum & 0xFF);
+		UART_SendString("\n");
+		
+		UART_SendString("Temperatura cruda: 0x");
+		send_hex_byte((raw_temp >> 16) & 0xFF);
+		send_hex_byte((raw_temp >> 8) & 0xFF);
+		send_hex_byte(raw_temp & 0xFF);
+		UART_SendString("\n");
+		} else {
+		UART_SendString("Error leyendo datos crudos\n");
+	}
+}
+
+void DisplayMeasurements(uint16_t temp_scaled, uint16_t hum_scaled) {
+	char buffer[6];
+	
+	// Mostrar humedad en formato Hxx.xH
+	UART_SendString("H");
+	
+	// Parte entera de humedad
+	uint8_t hum_int = hum_scaled / 100;
+	uint8_t hum_dec = hum_scaled % 100;
+	
+	// Leading zero si es necesario
+	if (hum_int < 10) {
+		UART_SendString("0");
+	}
+	uint16_to_str(hum_int, buffer, 0);
+	UART_SendString(buffer);
+	
+	UART_SendString(".");
+	
+	// Parte decimal (solo primer dígito)
+	uint8_t first_decimal = hum_dec / 10;
+	buffer[0] = '0' + first_decimal;
+	buffer[1] = '\0';
+	UART_SendString(buffer);
+	
+	UART_SendString("H\n");
+	
+	// Opcional: mostrar temperatura también
+	UART_SendString("T");
+	uint8_t temp_int = temp_scaled / 100;
+	uint8_t temp_dec = temp_scaled % 100;
+	
+	if (temp_int < 10 && temp_int >= 0) {
+		UART_SendString("0");
+	}
+	uint16_to_str(temp_int, buffer, 0);
+	UART_SendString(buffer);
+	
+	UART_SendString(".");
+	first_decimal = temp_dec / 10;
+	buffer[0] = '0' + first_decimal;
+	buffer[1] = '\0';
+	UART_SendString(buffer);
+	
+	UART_SendString("C\n");
+}
+
+
+
+//----------------------------------------------------------------------------------------
+//-------------FUNCIONES AUXILEARES------------------------------------------------------
+
+// Función auxiliar para convertir uint16_t a string
+void uint16_to_str(uint16_t value, char* buffer, uint8_t decimal_places) {
+	uint8_t i = 0;
+	uint16_t temp = value;
+	
+	// Calcular longitud
+	uint8_t digits = 1;
+	uint16_t divisor = 1;
+	while (temp >= 10) {
+		temp /= 10;
+		digits++;
+		divisor *= 10;
+	}
+	
+	// Convertir dígito por dígito
+	temp = value;
+	for (uint8_t j = 0; j < digits; j++) {
+		uint8_t digit = temp / divisor;
+		buffer[i++] = '0' + digit;
+		temp %= divisor;
+		divisor /= 10;
+	}
+	
+	buffer[i] = '\0';
+}
+
 void I2C_Scanner(void) {
 	
 	UART_SendString("Escaneando dispositivos I2C...\n");
@@ -471,103 +625,20 @@ void I2C_Scanner(void) {
 	UART_SendString("Escaneo completado\n");
 }
 
-//Funcion para lectura de estado del AHT10
-uint8_t AHT10_ReadStatusByte(uint8_t *status) {
-	if (!I2C_Master_Start(AHT10_ADDRESS, 1)) { // 1 para lectura
-		return 0; // Error
-	}
-	*status = I2C_Master_Read(0); // 0 para NACK
-	I2C_Master_Stop();
-	return 1; // Éxito
+// Enviar byte en formato hexadecimal
+void send_hex_byte(uint8_t byte) {
+	char hex_chars[] = "0123456789ABCDEF";
+	UART_SendChar(hex_chars[(byte >> 4) & 0x0F]);
+	UART_SendChar(hex_chars[byte & 0x0F]);
 }
 
-void AHT10_Debug_ReadRaw(void)
-{
-	uint32_t raw_temp, raw_hum;
-	
-	if (AHT10_ReadRawData(&raw_temp, &raw_hum)) {
-		char debug_msg[40];
-		
-		// Mostrar datos crudos
-		//sprintf(debug_msg, "Datos crudos - Hum: %lu (%06lX), Temp: %lu (%06lX)\n",
-		//raw_hum, raw_hum, raw_temp, raw_temp);
-		//UART_SendString(debug_msg);
-		
-		// Calcular valores manualmente
-		float hum_calc = ((float)raw_hum / 1048576.0f) * 100.0f;
-		float temp_calc = ((float)raw_temp / 1048576.0f) * 200.0f - 50.0f;
-		
-		// Mostrar cálculos con aritmética entera para evitar problemas de sprintf
-		//UART_SendString("Calculo manual - Hum: ");
-		
-		int hum_int = (int)hum_calc;
-		int hum_frac = (int)((hum_calc - hum_int) * 100);
-		itoa(hum_int, debug_msg, 10);
-		UART_SendString(debug_msg);
-		UART_SendString(".");
-		if (hum_frac < 10) UART_SendString("0");
-		itoa(hum_frac, debug_msg, 10);
-		UART_SendString(debug_msg);
-		UART_SendString("%");
-		
-		UART_SendString(", Temp: ");
-		
-		int temp_int = (int)temp_calc;
-		int temp_frac = (int)((temp_calc - temp_int) * 100);
-		itoa(temp_int, debug_msg, 10);
-		UART_SendString(debug_msg);
-		UART_SendString(".");
-		if (temp_frac < 10) UART_SendString("0");
-		itoa(temp_frac, debug_msg, 10);
-		UART_SendString(debug_msg);
-		UART_SendString("C\n");
-		
-		} else {
-		UART_SendString("Error leyendo datos crudos\n");
-	}
+// Función auxiliar para mostrar 24 bits en hex
+void send_hex_24bit(uint32_t value) {
+	send_hex_byte((value >> 16) & 0xFF);
+	send_hex_byte((value >> 8) & 0xFF);
+	send_hex_byte(value & 0xFF);
 }
 
-void DisplayMeasurements(float temp, float hum) {
-	char buffer[20];  // Buffer para conversión de números a texto
-	
-	// FORMATO: "Hxx.xH" donde:
-	// - Primera 'H': delimitador inicial
-	// - xx: dos dígitos enteros (con leading zero si es necesario)
-	// - .x: punto y un dígito decimal
-	// - Última 'H': delimitador final
-	
-	UART_SendString("H");  // Enviar delimitador inicial
-	
-	// CONVERSIÓN DE PARTE ENTERA DE HUMEDAD
-	int hum_int = (int)humedad_read;  // Obtener parte entera de la variable global
-	int hum_frac = (int)((humedad_read - hum_int) * 10 + 0.5);  // Parte decimal redondeada
-	
-	// AGREGAR LEADING ZERO si la parte entera es menor a 10
-	// Ejemplo: 5.3% se convierte en "05.3"
-	if (hum_int < 10) {
-		UART_SendString("0");  // Agregar cero a la izquierda
-	}
-	
-	// CONVERTIR Y ENVIAR PARTE ENTERA
-	itoa(hum_int, buffer, 10);  // Convertir entero a string (base 10)
-	UART_SendString(buffer);
-	
-	// ENVIAR PUNTO DECIMAL
-	UART_SendString(".");
-	
-	// CONVERTIR Y ENVIAR PARTE DECIMAL
-	itoa(hum_frac, buffer, 10);  // Convertir decimal a string
-	UART_SendString(buffer);
-	
-	// ENVIAR DELIMITADOR FINAL Y NUEVA LÍNEA
-	UART_SendString("H\n");
-	
-	// La temperatura se recibe como parámetro pero no se muestra en este formato
-	// Sin embargo, está almacenada en temperatura_read por si se necesita después
-}
-
-
-//----------------------------------------------------------------------------------------
 
 /****************************************/
 // Interrupt routines

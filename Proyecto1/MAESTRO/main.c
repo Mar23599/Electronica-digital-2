@@ -7,8 +7,10 @@
 
 #include "LCD/LCD.h"
 #include "I2C/I2C.h"
+#include "UART/UART.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -17,7 +19,7 @@
 #define AHT10_ADDRESS 0x38
 #define TSL2561_ADDRESS 0x39
 #define SLAVE_ADDRESS 0x40
-#define ESP32_I2C_ADDRESS 0x50     // Dirección para el ESP32
+#define  SLAVE_ADDRESS_MOTORS 0x050
 #define FILTER_SAMPLES 5
 
 // Comandos para AHT10
@@ -78,7 +80,10 @@ float ReadSlaveTemperature(void);
 void SendSensorDataToESP(float temp, float hum, float lux);
 
 int main(void) {
+   cli();
     System_Init();
+	sei();
+	
     Main_Loop();
     
     return 0;
@@ -88,6 +93,7 @@ void System_Init(void) {
     // Inicializar periféricos básicos
     LCD_Init();
     I2C_Master_Init(100000UL, 1);
+	UART_init(1);
     
     // Inicializar subsistemas
     Display_Init();
@@ -195,16 +201,16 @@ void Main_Loop(void) {
             LCD_WriteString("TempErr");
             current_temp = -100.0;
         }
+		
+		//Envio por UART
+		SendSensorDataUART(current_hum, current_temp, current_lux);
 
         // Mostrar valores si son válidos
         if(current_hum >= 0) DisplayHumidity(current_hum);
         if(current_temp > -40) DisplayTemperature(current_temp);
         if(current_lux >= 0) DisplayLight(current_lux);
 
-        // Enviar datos al ESP32
-        if(current_hum >= 0 && current_temp > -40 && current_lux >= 0) {
-            SendSensorDataToESP(current_temp, current_hum, current_lux);
-        }
+        
 
         _delay_ms(1000);
     }
@@ -479,23 +485,119 @@ float ReadSlaveTemperature(void) {
     return -100.0; // Valor de error
 }
 
-void SendSensorDataToESP(float temp, float hum, float lux) {
-    // Estructura para enviar datos al ESP32
-    typedef struct {
-        float temperature;
-        float humidity;
-        float light;
-    } SensorData;
-    
-    SensorData data = {temp, hum, lux};
-    
-    // Enviar datos al ESP32
-    I2C_Master_Start();
-    if(I2C_Master_Write(ESP32_I2C_ADDRESS << 1)) {
-        uint8_t* bytes = (uint8_t*)&data;
-        for(uint8_t i = 0; i < sizeof(data); i++) {
-            I2C_Master_Write(bytes[i]);
-        }
-    }
-    I2C_Master_Stop();
+
+//-------------------ENVIO POR UART------------------------
+
+void SendSensorDataUART(float humidity, float temperature, float lux) {
+	// Buffer temporal para conversiones
+	char buffer[10];
+	
+	// Iniciar formato con humedad
+	UART_SendChar('H');
+	
+	// Convertir y enviar humedad (xx.x)
+	if (humidity >= 0 && humidity <= 100) {
+		uint16_t hum_scaled = (uint16_t)(humidity * 10); // Escalar a 1 decimal
+		uint8_t hum_int = hum_scaled / 10;
+		uint8_t hum_dec = hum_scaled % 10;
+		
+		// Parte entera con leading zero si es necesario
+		if (hum_int < 10) {
+			UART_SendChar('0');
+			buffer[0] = '0' + hum_int;
+			buffer[1] = '\0';
+			UART_SendString(buffer);
+			} else {
+			itoa(hum_int, buffer, 10);
+			UART_SendString(buffer);
+		}
+		
+		// Parte decimal
+		UART_SendChar('.');
+		buffer[0] = '0' + hum_dec;
+		buffer[1] = '\0';
+		UART_SendString(buffer);
+		} else {
+		// Valor inválido
+		UART_SendString("NaN");
+	}
+	
+	UART_SendChar('H');
+	UART_SendChar('-');
+	UART_SendChar('T');
+	
+	// Convertir y enviar temperatura (xx.x)
+	if (temperature >= -40 && temperature <= 80) {
+		// Manejar temperatura negativa
+		if (temperature < 0) {
+			UART_SendChar('-');
+			temperature = -temperature;
+		}
+		
+		uint16_t temp_scaled = (uint16_t)(temperature * 10); // Escalar a 1 decimal
+		uint8_t temp_int = temp_scaled / 10;
+		uint8_t temp_dec = temp_scaled % 10;
+		
+		// Parte entera con leading zero si es necesario
+		if (temp_int < 10) {
+			UART_SendChar('0');
+			buffer[0] = '0' + temp_int;
+			buffer[1] = '\0';
+			UART_SendString(buffer);
+			} else {
+			itoa(temp_int, buffer, 10);
+			UART_SendString(buffer);
+		}
+		
+		// Parte decimal
+		UART_SendChar('.');
+		buffer[0] = '0' + temp_dec;
+		buffer[1] = '\0';
+		UART_SendString(buffer);
+		} else {
+		// Valor inválido
+		UART_SendString("NaN");
+	}
+	
+	UART_SendChar('T');
+	UART_SendChar('-');
+	UART_SendChar('L');
+	
+	// Convertir y enviar lux (xxxx.x)
+	if (lux >= 0) {
+		uint32_t lux_scaled = (uint32_t)(lux * 10); // Escalar a 1 decimal
+		
+		// Determinar cuántos dígitos tiene la parte entera
+		uint32_t temp_lux = lux_scaled / 10;
+		uint8_t digits = 1;
+		uint32_t divisor = 1;
+		
+		while (temp_lux >= 10) {
+			temp_lux /= 10;
+			digits++;
+			divisor *= 10;
+		}
+		
+		// Enviar parte entera
+		temp_lux = lux_scaled / 10;
+		for (uint8_t i = 0; i < digits; i++) {
+			uint8_t digit = temp_lux / divisor;
+			UART_SendChar('0' + digit);
+			temp_lux %= divisor;
+			divisor /= 10;
+		}
+		
+		// Parte decimal
+		UART_SendChar('.');
+		uint8_t lux_dec = lux_scaled % 10;
+		UART_SendChar('0' + lux_dec);
+		} else {
+		// Valor inválido
+		UART_SendString("NaN");
+	}
+	
+	UART_SendChar('L');
+	UART_SendChar('\n'); // Fin del mensaje
 }
+
+
