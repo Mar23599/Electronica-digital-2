@@ -6,6 +6,7 @@
 #include <avr/interrupt.h>
 #include <stdint.h>
 #include "I2C.h"
+#include "ServoLib.h"
 
 #define I2C_SLAVE_ADDRESS 0x41  // Dirección de 7 bits del esclavo
 
@@ -57,6 +58,8 @@ void setup(void)
     // Inicialmente apagados
     PORTD &= ~(1 << PORTD5);
     PORTB &= ~(1 << PORTB0);
+	
+	servo_init(); //Inializar servo
 
     sei();
 }
@@ -78,12 +81,15 @@ void process_command(uint8_t command)
             PORTD &= ~(1 << PORTD5);
             break;
 
-        case 'C':  // Encender PB0
+        case 'C':  // Abrir puerta con el servo
             PORTB |= (1 << PORTB0);
+			servo_175_grados();
+			
             break;
 
-        case 'D':  // Apagar PB0
+        case 'D':  // Cerrar puerta con el Servo
             PORTB &= ~(1 << PORTB0);
+			servo_0_grados();
             break;
 
         default:

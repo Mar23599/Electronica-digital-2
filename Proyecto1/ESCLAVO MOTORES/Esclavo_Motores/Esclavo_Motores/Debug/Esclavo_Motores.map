@@ -29,6 +29,9 @@ Discarded input sections
  .text          0x00000000        0x0 main.o
  .data          0x00000000        0x0 main.o
  .bss           0x00000000        0x0 main.o
+ .text          0x00000000        0x0 ServoLib.o
+ .data          0x00000000        0x0 ServoLib.o
+ .bss           0x00000000        0x0 ServoLib.o
  .text          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodsi4.o)
  .data          0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodsi4.o)
  .bss           0x00000000        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodsi4.o)
@@ -111,6 +114,7 @@ Address of section .data set to 0x800100
 LOAD C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
 LOAD I2C.o
 LOAD main.o
+LOAD ServoLib.o
 START GROUP
 LOAD c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/../../../../avr/lib/avr5\libm.a
 END GROUP
@@ -220,7 +224,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x23c
+.text           0x00000000      0x2ba
  *(.vectors)
  .vectors       0x00000000       0x68 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
                 0x00000000                __vector_default
@@ -309,23 +313,32 @@ END GROUP
  .text.I2C_Slave_Init
                 0x00000112       0x14 I2C.o
                 0x00000112                I2C_Slave_Init
- .text.setup    0x00000126       0x24 main.o
+ .text.setup    0x00000126       0x28 main.o
                 0x00000126                setup
  .text.process_command
-                0x0000014a       0x36 main.o
-                0x0000014a                process_command
- .text.main     0x00000180       0x24 main.o
-                0x00000180                main
+                0x0000014e       0x3e main.o
+                0x0000014e                process_command
+ .text.main     0x0000018c       0x24 main.o
+                0x0000018c                main
  .text.__vector_24
-                0x000001a4       0x88 main.o
-                0x000001a4                __vector_24
- .text.libgcc   0x0000022c        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
-                0x0000022c                __tablejump2__
-                0x00000238                . = ALIGN (0x2)
+                0x000001b0       0x88 main.o
+                0x000001b0                __vector_24
+ .text.servo_init
+                0x00000238       0x3e ServoLib.o
+                0x00000238                servo_init
+ .text.servo_0_grados
+                0x00000276       0x1a ServoLib.o
+                0x00000276                servo_0_grados
+ .text.servo_175_grados
+                0x00000290       0x1a ServoLib.o
+                0x00000290                servo_175_grados
+ .text.libgcc   0x000002aa        0xc c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_tablejump2.o)
+                0x000002aa                __tablejump2__
+                0x000002b6                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000238        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00000238                _exit
-                0x00000238                exit
+ .fini9         0x000002b6        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x000002b6                _exit
+                0x000002b6                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -344,11 +357,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000238        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x000002b6        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x0000023c                _etext = .
+                0x000002ba                _etext = .
 
-.data           0x00800100        0x0 load address 0x0000023c
+.data           0x00800100        0x0 load address 0x000002ba
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -372,8 +385,8 @@ END GROUP
                 0x00800101                received_command
  *(COMMON)
                 0x00800102                PROVIDE (__bss_end, .)
-                0x0000023c                __data_load_start = LOADADDR (.data)
-                0x0000023c                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000002ba                __data_load_start = LOADADDR (.data)
+                0x000002ba                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800102        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -424,6 +437,7 @@ END GROUP
  .comment       0x00000000       0x30 I2C.o
                                  0x31 (size before relaxing)
  .comment       0x00000030       0x31 main.o
+ .comment       0x00000030       0x31 ServoLib.o
 
 .note.gnu.avr.deviceinfo
                 0x00000000       0x40
@@ -445,51 +459,60 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x80
+.debug_aranges  0x00000000       0xb0
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x48 I2C.o
  .debug_aranges
                 0x00000048       0x38 main.o
+ .debug_aranges
+                0x00000080       0x30 ServoLib.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x8cb
+.debug_info     0x00000000      0xac0
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x5f4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_info    0x000005f4      0x183 I2C.o
- .debug_info    0x00000777      0x154 main.o
+ .debug_info    0x00000777      0x19a main.o
+ .debug_info    0x00000911      0x1af ServoLib.o
 
-.debug_abbrev   0x00000000      0x77c
+.debug_abbrev   0x00000000      0x84f
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x5a2 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_abbrev  0x000005a2       0xe4 I2C.o
- .debug_abbrev  0x00000686       0xf6 main.o
+ .debug_abbrev  0x00000686       0xf8 main.o
+ .debug_abbrev  0x0000077e       0xd1 ServoLib.o
 
-.debug_line     0x00000000      0x4f3
+.debug_line     0x00000000      0x67b
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x134 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_line    0x00000134      0x217 I2C.o
- .debug_line    0x0000034b      0x1a8 main.o
+ .debug_line    0x0000034b      0x1c8 main.o
+ .debug_line    0x00000513      0x168 ServoLib.o
 
-.debug_frame    0x00000000      0x100
+.debug_frame    0x00000000      0x144
  *(.debug_frame)
  .debug_frame   0x00000000       0x84 I2C.o
  .debug_frame   0x00000084       0x7c main.o
+ .debug_frame   0x00000100       0x44 ServoLib.o
 
-.debug_str      0x00000000      0x46a
+.debug_str      0x00000000      0x4f9
  *(.debug_str)
  .debug_str     0x00000000      0x208 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.7.374/gcc/dev/atmega328p/avr5/crtatmega328p.o
  .debug_str     0x00000208      0x201 I2C.o
                                 0x235 (size before relaxing)
- .debug_str     0x00000409       0x61 main.o
-                                0x212 (size before relaxing)
+ .debug_str     0x00000409       0x8c main.o
+                                0x23d (size before relaxing)
+ .debug_str     0x00000495       0x64 ServoLib.o
+                                0x229 (size before relaxing)
 
-.debug_loc      0x00000000      0x2a5
+.debug_loc      0x00000000      0x37d
  *(.debug_loc)
  .debug_loc     0x00000000      0x172 I2C.o
  .debug_loc     0x00000172      0x133 main.o
+ .debug_loc     0x000002a5       0xd8 ServoLib.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -509,10 +532,11 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x60
+.debug_ranges   0x00000000       0x80
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x38 I2C.o
  .debug_ranges  0x00000038       0x28 main.o
+ .debug_ranges  0x00000060       0x20 ServoLib.o
 
 .debug_macro
  *(.debug_macro)

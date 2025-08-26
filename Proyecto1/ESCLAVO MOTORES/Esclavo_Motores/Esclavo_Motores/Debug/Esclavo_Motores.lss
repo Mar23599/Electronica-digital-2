@@ -3,31 +3,31 @@ Esclavo_Motores.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  000002b0  2**0
+  0 .data         00000000  00800100  00800100  0000032e  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000023c  00000000  00000000  00000074  2**1
+  1 .text         000002ba  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000002  00800100  00800100  000002b0  2**0
+  2 .bss          00000002  00800100  00800100  0000032e  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000002b0  2**0
+  3 .comment      00000030  00000000  00000000  0000032e  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000002e0  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000360  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000080  00000000  00000000  00000320  2**0
+  5 .debug_aranges 000000b0  00000000  00000000  000003a0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000008cb  00000000  00000000  000003a0  2**0
+  6 .debug_info   00000ac0  00000000  00000000  00000450  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000077c  00000000  00000000  00000c6b  2**0
+  7 .debug_abbrev 0000084f  00000000  00000000  00000f10  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000004f3  00000000  00000000  000013e7  2**0
+  8 .debug_line   0000067b  00000000  00000000  0000175f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000100  00000000  00000000  000018dc  2**2
+  9 .debug_frame  00000144  00000000  00000000  00001ddc  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000046a  00000000  00000000  000019dc  2**0
+ 10 .debug_str    000004f9  00000000  00000000  00001f20  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000002a5  00000000  00000000  00001e46  2**0
+ 11 .debug_loc    0000037d  00000000  00000000  00002419  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000060  00000000  00000000  000020eb  2**0
+ 12 .debug_ranges 00000080  00000000  00000000  00002796  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -57,73 +57,73 @@ Disassembly of section .text:
   54:	0c 94 87 00 	jmp	0x10e	; 0x10e <__bad_interrupt>
   58:	0c 94 87 00 	jmp	0x10e	; 0x10e <__bad_interrupt>
   5c:	0c 94 87 00 	jmp	0x10e	; 0x10e <__bad_interrupt>
-  60:	0c 94 d2 00 	jmp	0x1a4	; 0x1a4 <__vector_24>
+  60:	0c 94 d8 00 	jmp	0x1b0	; 0x1b0 <__vector_24>
   64:	0c 94 87 00 	jmp	0x10e	; 0x10e <__bad_interrupt>
-  68:	ed 00       	.word	0x00ed	; ????
-  6a:	08 01       	movw	r0, r16
-  6c:	08 01       	movw	r0, r16
-  6e:	08 01       	movw	r0, r16
-  70:	08 01       	movw	r0, r16
-  72:	08 01       	movw	r0, r16
-  74:	08 01       	movw	r0, r16
-  76:	08 01       	movw	r0, r16
-  78:	ed 00       	.word	0x00ed	; ????
-  7a:	08 01       	movw	r0, r16
-  7c:	08 01       	movw	r0, r16
-  7e:	08 01       	movw	r0, r16
-  80:	08 01       	movw	r0, r16
-  82:	08 01       	movw	r0, r16
-  84:	08 01       	movw	r0, r16
-  86:	08 01       	movw	r0, r16
-  88:	ed 00       	.word	0x00ed	; ????
-  8a:	08 01       	movw	r0, r16
-  8c:	08 01       	movw	r0, r16
-  8e:	08 01       	movw	r0, r16
-  90:	08 01       	movw	r0, r16
-  92:	08 01       	movw	r0, r16
-  94:	08 01       	movw	r0, r16
-  96:	08 01       	movw	r0, r16
-  98:	ed 00       	.word	0x00ed	; ????
-  9a:	08 01       	movw	r0, r16
-  9c:	08 01       	movw	r0, r16
-  9e:	08 01       	movw	r0, r16
-  a0:	08 01       	movw	r0, r16
-  a2:	08 01       	movw	r0, r16
-  a4:	08 01       	movw	r0, r16
-  a6:	08 01       	movw	r0, r16
-  a8:	f1 00       	.word	0x00f1	; ????
-  aa:	08 01       	movw	r0, r16
-  ac:	08 01       	movw	r0, r16
-  ae:	08 01       	movw	r0, r16
-  b0:	08 01       	movw	r0, r16
-  b2:	08 01       	movw	r0, r16
-  b4:	08 01       	movw	r0, r16
-  b6:	08 01       	movw	r0, r16
-  b8:	fc 00       	.word	0x00fc	; ????
-  ba:	08 01       	movw	r0, r16
-  bc:	08 01       	movw	r0, r16
-  be:	08 01       	movw	r0, r16
-  c0:	08 01       	movw	r0, r16
-  c2:	08 01       	movw	r0, r16
-  c4:	08 01       	movw	r0, r16
-  c6:	08 01       	movw	r0, r16
-  c8:	f1 00       	.word	0x00f1	; ????
-  ca:	08 01       	movw	r0, r16
-  cc:	08 01       	movw	r0, r16
-  ce:	08 01       	movw	r0, r16
-  d0:	08 01       	movw	r0, r16
-  d2:	08 01       	movw	r0, r16
-  d4:	08 01       	movw	r0, r16
-  d6:	08 01       	movw	r0, r16
-  d8:	fc 00       	.word	0x00fc	; ????
-  da:	08 01       	movw	r0, r16
-  dc:	08 01       	movw	r0, r16
-  de:	08 01       	movw	r0, r16
-  e0:	08 01       	movw	r0, r16
-  e2:	08 01       	movw	r0, r16
-  e4:	08 01       	movw	r0, r16
-  e6:	08 01       	movw	r0, r16
-  e8:	04 01       	movw	r0, r8
+  68:	f3 00       	.word	0x00f3	; ????
+  6a:	0e 01       	movw	r0, r28
+  6c:	0e 01       	movw	r0, r28
+  6e:	0e 01       	movw	r0, r28
+  70:	0e 01       	movw	r0, r28
+  72:	0e 01       	movw	r0, r28
+  74:	0e 01       	movw	r0, r28
+  76:	0e 01       	movw	r0, r28
+  78:	f3 00       	.word	0x00f3	; ????
+  7a:	0e 01       	movw	r0, r28
+  7c:	0e 01       	movw	r0, r28
+  7e:	0e 01       	movw	r0, r28
+  80:	0e 01       	movw	r0, r28
+  82:	0e 01       	movw	r0, r28
+  84:	0e 01       	movw	r0, r28
+  86:	0e 01       	movw	r0, r28
+  88:	f3 00       	.word	0x00f3	; ????
+  8a:	0e 01       	movw	r0, r28
+  8c:	0e 01       	movw	r0, r28
+  8e:	0e 01       	movw	r0, r28
+  90:	0e 01       	movw	r0, r28
+  92:	0e 01       	movw	r0, r28
+  94:	0e 01       	movw	r0, r28
+  96:	0e 01       	movw	r0, r28
+  98:	f3 00       	.word	0x00f3	; ????
+  9a:	0e 01       	movw	r0, r28
+  9c:	0e 01       	movw	r0, r28
+  9e:	0e 01       	movw	r0, r28
+  a0:	0e 01       	movw	r0, r28
+  a2:	0e 01       	movw	r0, r28
+  a4:	0e 01       	movw	r0, r28
+  a6:	0e 01       	movw	r0, r28
+  a8:	f7 00       	.word	0x00f7	; ????
+  aa:	0e 01       	movw	r0, r28
+  ac:	0e 01       	movw	r0, r28
+  ae:	0e 01       	movw	r0, r28
+  b0:	0e 01       	movw	r0, r28
+  b2:	0e 01       	movw	r0, r28
+  b4:	0e 01       	movw	r0, r28
+  b6:	0e 01       	movw	r0, r28
+  b8:	02 01       	movw	r0, r4
+  ba:	0e 01       	movw	r0, r28
+  bc:	0e 01       	movw	r0, r28
+  be:	0e 01       	movw	r0, r28
+  c0:	0e 01       	movw	r0, r28
+  c2:	0e 01       	movw	r0, r28
+  c4:	0e 01       	movw	r0, r28
+  c6:	0e 01       	movw	r0, r28
+  c8:	f7 00       	.word	0x00f7	; ????
+  ca:	0e 01       	movw	r0, r28
+  cc:	0e 01       	movw	r0, r28
+  ce:	0e 01       	movw	r0, r28
+  d0:	0e 01       	movw	r0, r28
+  d2:	0e 01       	movw	r0, r28
+  d4:	0e 01       	movw	r0, r28
+  d6:	0e 01       	movw	r0, r28
+  d8:	02 01       	movw	r0, r4
+  da:	0e 01       	movw	r0, r28
+  dc:	0e 01       	movw	r0, r28
+  de:	0e 01       	movw	r0, r28
+  e0:	0e 01       	movw	r0, r28
+  e2:	0e 01       	movw	r0, r28
+  e4:	0e 01       	movw	r0, r28
+  e6:	0e 01       	movw	r0, r28
+  e8:	0a 01       	movw	r0, r20
 
 000000ea <__ctors_end>:
   ea:	11 24       	eor	r1, r1
@@ -146,8 +146,8 @@ Disassembly of section .text:
  100:	a2 30       	cpi	r26, 0x02	; 2
  102:	b2 07       	cpc	r27, r18
  104:	e1 f7       	brne	.-8      	; 0xfe <.do_clear_bss_loop>
- 106:	0e 94 c0 00 	call	0x180	; 0x180 <main>
- 10a:	0c 94 1c 01 	jmp	0x238	; 0x238 <_exit>
+ 106:	0e 94 c6 00 	call	0x18c	; 0x18c <main>
+ 10a:	0c 94 5b 01 	jmp	0x2b6	; 0x2b6 <_exit>
 
 0000010e <__bad_interrupt>:
  10e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
@@ -205,204 +205,300 @@ void setup(void)
  140:	85 b1       	in	r24, 0x05	; 5
  142:	8e 7f       	andi	r24, 0xFE	; 254
  144:	85 b9       	out	0x05, r24	; 5
+	
+	servo_init(); //Inializar servo
+ 146:	0e 94 1c 01 	call	0x238	; 0x238 <servo_init>
 
     sei();
- 146:	78 94       	sei
- 148:	08 95       	ret
+ 14a:	78 94       	sei
+ 14c:	08 95       	ret
 
-0000014a <process_command>:
+0000014e <process_command>:
 //------------------------------------------------------
 void process_command(uint8_t command)
 {
 	
 	
     switch (command)
- 14a:	82 34       	cpi	r24, 0x42	; 66
- 14c:	69 f0       	breq	.+26     	; 0x168 <process_command+0x1e>
- 14e:	18 f4       	brcc	.+6      	; 0x156 <process_command+0xc>
- 150:	81 34       	cpi	r24, 0x41	; 65
- 152:	31 f0       	breq	.+12     	; 0x160 <process_command+0x16>
- 154:	08 95       	ret
- 156:	83 34       	cpi	r24, 0x43	; 67
- 158:	59 f0       	breq	.+22     	; 0x170 <process_command+0x26>
- 15a:	84 34       	cpi	r24, 0x44	; 68
- 15c:	69 f0       	breq	.+26     	; 0x178 <process_command+0x2e>
- 15e:	08 95       	ret
+ 14e:	82 34       	cpi	r24, 0x42	; 66
+ 150:	69 f0       	breq	.+26     	; 0x16c <process_command+0x1e>
+ 152:	18 f4       	brcc	.+6      	; 0x15a <process_command+0xc>
+ 154:	81 34       	cpi	r24, 0x41	; 65
+ 156:	31 f0       	breq	.+12     	; 0x164 <process_command+0x16>
+ 158:	08 95       	ret
+ 15a:	83 34       	cpi	r24, 0x43	; 67
+ 15c:	59 f0       	breq	.+22     	; 0x174 <process_command+0x26>
+ 15e:	84 34       	cpi	r24, 0x44	; 68
+ 160:	79 f0       	breq	.+30     	; 0x180 <process_command+0x32>
+ 162:	08 95       	ret
     {
         case 'A':  // Encender PD5
             PORTD |= (1 << PORTD5);
- 160:	8b b1       	in	r24, 0x0b	; 11
- 162:	80 62       	ori	r24, 0x20	; 32
- 164:	8b b9       	out	0x0b, r24	; 11
+ 164:	8b b1       	in	r24, 0x0b	; 11
+ 166:	80 62       	ori	r24, 0x20	; 32
+ 168:	8b b9       	out	0x0b, r24	; 11
             break;
- 166:	08 95       	ret
+ 16a:	08 95       	ret
 
         case 'B':  // Apagar PD5
             PORTD &= ~(1 << PORTD5);
- 168:	8b b1       	in	r24, 0x0b	; 11
- 16a:	8f 7d       	andi	r24, 0xDF	; 223
- 16c:	8b b9       	out	0x0b, r24	; 11
+ 16c:	8b b1       	in	r24, 0x0b	; 11
+ 16e:	8f 7d       	andi	r24, 0xDF	; 223
+ 170:	8b b9       	out	0x0b, r24	; 11
             break;
- 16e:	08 95       	ret
+ 172:	08 95       	ret
 
-        case 'C':  // Encender PB0
+        case 'C':  // Abrir puerta con el servo
             PORTB |= (1 << PORTB0);
- 170:	85 b1       	in	r24, 0x05	; 5
- 172:	81 60       	ori	r24, 0x01	; 1
- 174:	85 b9       	out	0x05, r24	; 5
+ 174:	85 b1       	in	r24, 0x05	; 5
+ 176:	81 60       	ori	r24, 0x01	; 1
+ 178:	85 b9       	out	0x05, r24	; 5
+			servo_175_grados();
+ 17a:	0e 94 48 01 	call	0x290	; 0x290 <servo_175_grados>
+			
             break;
- 176:	08 95       	ret
-
-        case 'D':  // Apagar PB0
-            PORTB &= ~(1 << PORTB0);
- 178:	85 b1       	in	r24, 0x05	; 5
- 17a:	8e 7f       	andi	r24, 0xFE	; 254
- 17c:	85 b9       	out	0x05, r24	; 5
  17e:	08 95       	ret
 
-00000180 <main>:
+        case 'D':  // Cerrar puerta con el Servo
+            PORTB &= ~(1 << PORTB0);
+ 180:	85 b1       	in	r24, 0x05	; 5
+ 182:	8e 7f       	andi	r24, 0xFE	; 254
+ 184:	85 b9       	out	0x05, r24	; 5
+			servo_0_grados();
+ 186:	0e 94 3b 01 	call	0x276	; 0x276 <servo_0_grados>
+ 18a:	08 95       	ret
+
+0000018c <main>:
 //------------------------------------------------------
 // Main
 //------------------------------------------------------
 int main(void)
 {
     setup();
- 180:	0e 94 93 00 	call	0x126	; 0x126 <setup>
+ 18c:	0e 94 93 00 	call	0x126	; 0x126 <setup>
 
     while (1)
     {
 		
 		  
         if (command_received_flag)
- 184:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
- 188:	88 23       	and	r24, r24
- 18a:	e1 f3       	breq	.-8      	; 0x184 <main+0x4>
+ 190:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 194:	88 23       	and	r24, r24
+ 196:	e1 f3       	breq	.-8      	; 0x190 <main+0x4>
         {
             // Procesar el comando recibido
             process_command(received_command);
- 18c:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <received_command>
- 190:	0e 94 a5 00 	call	0x14a	; 0x14a <process_command>
+ 198:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <received_command>
+ 19c:	0e 94 a7 00 	call	0x14e	; 0x14e <process_command>
 
             // Limpiar flag
             command_received_flag = 0;
- 194:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 1a0:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
 
             // Rehabilitar la interfaz I2C
             TWCR |= (1 << TWEA) | (1 << TWEN) | (1 << TWIE);
- 198:	ec eb       	ldi	r30, 0xBC	; 188
- 19a:	f0 e0       	ldi	r31, 0x00	; 0
- 19c:	80 81       	ld	r24, Z
- 19e:	85 64       	ori	r24, 0x45	; 69
- 1a0:	80 83       	st	Z, r24
- 1a2:	f0 cf       	rjmp	.-32     	; 0x184 <main+0x4>
+ 1a4:	ec eb       	ldi	r30, 0xBC	; 188
+ 1a6:	f0 e0       	ldi	r31, 0x00	; 0
+ 1a8:	80 81       	ld	r24, Z
+ 1aa:	85 64       	ori	r24, 0x45	; 69
+ 1ac:	80 83       	st	Z, r24
+ 1ae:	f0 cf       	rjmp	.-32     	; 0x190 <main+0x4>
 
-000001a4 <__vector_24>:
+000001b0 <__vector_24>:
 
 //------------------------------------------------------
 // ISR de I2C (TWI)
 //------------------------------------------------------
 ISR(TWI_vect)
 {
- 1a4:	1f 92       	push	r1
- 1a6:	0f 92       	push	r0
- 1a8:	0f b6       	in	r0, 0x3f	; 63
- 1aa:	0f 92       	push	r0
- 1ac:	11 24       	eor	r1, r1
- 1ae:	8f 93       	push	r24
- 1b0:	9f 93       	push	r25
- 1b2:	af 93       	push	r26
- 1b4:	bf 93       	push	r27
- 1b6:	ef 93       	push	r30
- 1b8:	ff 93       	push	r31
+ 1b0:	1f 92       	push	r1
+ 1b2:	0f 92       	push	r0
+ 1b4:	0f b6       	in	r0, 0x3f	; 63
+ 1b6:	0f 92       	push	r0
+ 1b8:	11 24       	eor	r1, r1
+ 1ba:	8f 93       	push	r24
+ 1bc:	9f 93       	push	r25
+ 1be:	af 93       	push	r26
+ 1c0:	bf 93       	push	r27
+ 1c2:	ef 93       	push	r30
+ 1c4:	ff 93       	push	r31
     uint8_t status = TWSR & 0xF8;
- 1ba:	80 91 b9 00 	lds	r24, 0x00B9	; 0x8000b9 <__TEXT_REGION_LENGTH__+0x7f80b9>
- 1be:	e8 2f       	mov	r30, r24
- 1c0:	e8 7f       	andi	r30, 0xF8	; 248
+ 1c6:	80 91 b9 00 	lds	r24, 0x00B9	; 0x8000b9 <__TEXT_REGION_LENGTH__+0x7f80b9>
+ 1ca:	e8 2f       	mov	r30, r24
+ 1cc:	e8 7f       	andi	r30, 0xF8	; 248
 
     switch (status)
- 1c2:	8e 2f       	mov	r24, r30
- 1c4:	90 e0       	ldi	r25, 0x00	; 0
- 1c6:	fc 01       	movw	r30, r24
- 1c8:	e0 56       	subi	r30, 0x60	; 96
- 1ca:	f1 09       	sbc	r31, r1
- 1cc:	e1 34       	cpi	r30, 0x41	; 65
- 1ce:	f1 05       	cpc	r31, r1
- 1d0:	f8 f4       	brcc	.+62     	; 0x210 <__vector_24+0x6c>
- 1d2:	ec 5c       	subi	r30, 0xCC	; 204
- 1d4:	ff 4f       	sbci	r31, 0xFF	; 255
- 1d6:	0c 94 16 01 	jmp	0x22c	; 0x22c <__tablejump2__>
+ 1ce:	8e 2f       	mov	r24, r30
+ 1d0:	90 e0       	ldi	r25, 0x00	; 0
+ 1d2:	fc 01       	movw	r30, r24
+ 1d4:	e0 56       	subi	r30, 0x60	; 96
+ 1d6:	f1 09       	sbc	r31, r1
+ 1d8:	e1 34       	cpi	r30, 0x41	; 65
+ 1da:	f1 05       	cpc	r31, r1
+ 1dc:	f8 f4       	brcc	.+62     	; 0x21c <__vector_24+0x6c>
+ 1de:	ec 5c       	subi	r30, 0xCC	; 204
+ 1e0:	ff 4f       	sbci	r31, 0xFF	; 255
+ 1e2:	0c 94 55 01 	jmp	0x2aa	; 0x2aa <__tablejump2__>
         case 0x60:  // SLA+W recibido, ACK enviado
         case 0x68:  // SLA+W recibido tras arbitraje perdido
         case 0x70:  // Llamada general recibida, ACK enviado
         case 0x78:
             // Listo para recibir datos
             TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
- 1da:	85 ec       	ldi	r24, 0xC5	; 197
- 1dc:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
+ 1e6:	85 ec       	ldi	r24, 0xC5	; 197
+ 1e8:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
             break;
- 1e0:	1a c0       	rjmp	.+52     	; 0x216 <__vector_24+0x72>
+ 1ec:	1a c0       	rjmp	.+52     	; 0x222 <__vector_24+0x72>
 
         case 0x80:  // Dato recibido, ACK enviado
         case 0x90:
             received_command = TWDR;
- 1e2:	80 91 bb 00 	lds	r24, 0x00BB	; 0x8000bb <__TEXT_REGION_LENGTH__+0x7f80bb>
- 1e6:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <received_command>
+ 1ee:	80 91 bb 00 	lds	r24, 0x00BB	; 0x8000bb <__TEXT_REGION_LENGTH__+0x7f80bb>
+ 1f2:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <received_command>
             command_received_flag = 1;
- 1ea:	81 e0       	ldi	r24, 0x01	; 1
- 1ec:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 1f6:	81 e0       	ldi	r24, 0x01	; 1
+ 1f8:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
             TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
- 1f0:	85 ec       	ldi	r24, 0xC5	; 197
- 1f2:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
+ 1fc:	85 ec       	ldi	r24, 0xC5	; 197
+ 1fe:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
             break;
- 1f6:	0f c0       	rjmp	.+30     	; 0x216 <__vector_24+0x72>
+ 202:	0f c0       	rjmp	.+30     	; 0x222 <__vector_24+0x72>
 
         case 0x88:  // Dato recibido, NACK enviado
         case 0x98:
             received_command = TWDR;
- 1f8:	80 91 bb 00 	lds	r24, 0x00BB	; 0x8000bb <__TEXT_REGION_LENGTH__+0x7f80bb>
- 1fc:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <received_command>
+ 204:	80 91 bb 00 	lds	r24, 0x00BB	; 0x8000bb <__TEXT_REGION_LENGTH__+0x7f80bb>
+ 208:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <received_command>
             command_received_flag = 1;
- 200:	81 e0       	ldi	r24, 0x01	; 1
- 202:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+ 20c:	81 e0       	ldi	r24, 0x01	; 1
+ 20e:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
             break;
- 206:	07 c0       	rjmp	.+14     	; 0x216 <__vector_24+0x72>
+ 212:	07 c0       	rjmp	.+14     	; 0x222 <__vector_24+0x72>
 
         case 0xA0:  // STOP o REPEATED START recibido
             TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
- 208:	85 ec       	ldi	r24, 0xC5	; 197
- 20a:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
+ 214:	85 ec       	ldi	r24, 0xC5	; 197
+ 216:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
             break;
- 20e:	03 c0       	rjmp	.+6      	; 0x216 <__vector_24+0x72>
+ 21a:	03 c0       	rjmp	.+6      	; 0x222 <__vector_24+0x72>
 
         default:    // Estado no manejado ? resetear interfaz
             TWCR = (1 << TWEA) | (1 << TWEN) | (1 << TWIE) | (1 << TWINT);
- 210:	85 ec       	ldi	r24, 0xC5	; 197
- 212:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
+ 21c:	85 ec       	ldi	r24, 0xC5	; 197
+ 21e:	80 93 bc 00 	sts	0x00BC, r24	; 0x8000bc <__TEXT_REGION_LENGTH__+0x7f80bc>
             break;
     }
 }
- 216:	ff 91       	pop	r31
- 218:	ef 91       	pop	r30
- 21a:	bf 91       	pop	r27
- 21c:	af 91       	pop	r26
- 21e:	9f 91       	pop	r25
- 220:	8f 91       	pop	r24
- 222:	0f 90       	pop	r0
- 224:	0f be       	out	0x3f, r0	; 63
- 226:	0f 90       	pop	r0
- 228:	1f 90       	pop	r1
- 22a:	18 95       	reti
+ 222:	ff 91       	pop	r31
+ 224:	ef 91       	pop	r30
+ 226:	bf 91       	pop	r27
+ 228:	af 91       	pop	r26
+ 22a:	9f 91       	pop	r25
+ 22c:	8f 91       	pop	r24
+ 22e:	0f 90       	pop	r0
+ 230:	0f be       	out	0x3f, r0	; 63
+ 232:	0f 90       	pop	r0
+ 234:	1f 90       	pop	r1
+ 236:	18 95       	reti
 
-0000022c <__tablejump2__>:
- 22c:	ee 0f       	add	r30, r30
- 22e:	ff 1f       	adc	r31, r31
- 230:	05 90       	lpm	r0, Z+
- 232:	f4 91       	lpm	r31, Z
- 234:	e0 2d       	mov	r30, r0
- 236:	09 94       	ijmp
+00000238 <servo_init>:
+ */ 
 
-00000238 <_exit>:
- 238:	f8 94       	cli
+#include "ServoLib.h"
+void servo_init(void) {
+	// Configurar PB1 (OC1A) como salida
+	DDRB |= (1 << PB1);
+ 238:	84 b1       	in	r24, 0x04	; 4
+ 23a:	82 60       	ori	r24, 0x02	; 2
+ 23c:	84 b9       	out	0x04, r24	; 4
+	
+	// Configurar Timer1 en modo PWM de 10 bits (Fast PWM)
+	// TOP = ICR1, OC1A no invertido
+	TCCR1A = (1 << COM1A1) | (1 << WGM11);
+ 23e:	82 e8       	ldi	r24, 0x82	; 130
+ 240:	80 93 80 00 	sts	0x0080, r24	; 0x800080 <__TEXT_REGION_LENGTH__+0x7f8080>
+	TCCR1B = (1 << WGM13) | (1 << WGM12) | (1 << CS11); // Prescaler 8
+ 244:	8a e1       	ldi	r24, 0x1A	; 26
+ 246:	80 93 81 00 	sts	0x0081, r24	; 0x800081 <__TEXT_REGION_LENGTH__+0x7f8081>
+	
+	// Configurar frecuencia de PWM para servos (50Hz)
+	ICR1 = 39999; // Para 50Hz con prescaler 8 y F_CPU = 16MHz
+ 24a:	8f e3       	ldi	r24, 0x3F	; 63
+ 24c:	9c e9       	ldi	r25, 0x9C	; 156
+ 24e:	90 93 87 00 	sts	0x0087, r25	; 0x800087 <__TEXT_REGION_LENGTH__+0x7f8087>
+ 252:	80 93 86 00 	sts	0x0086, r24	; 0x800086 <__TEXT_REGION_LENGTH__+0x7f8086>
+	
+	// Inicializar servo en posición neutra (90°)
+	OCR1A = 3000; // Valor inicial aproximado para 90°
+ 256:	88 eb       	ldi	r24, 0xB8	; 184
+ 258:	9b e0       	ldi	r25, 0x0B	; 11
+ 25a:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f8089>
+ 25e:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f8088>
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
 
-0000023a <__stop_program>:
- 23a:	ff cf       	rjmp	.-2      	; 0x23a <__stop_program>
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 262:	2f e9       	ldi	r18, 0x9F	; 159
+ 264:	86 e8       	ldi	r24, 0x86	; 134
+ 266:	91 e0       	ldi	r25, 0x01	; 1
+ 268:	21 50       	subi	r18, 0x01	; 1
+ 26a:	80 40       	sbci	r24, 0x00	; 0
+ 26c:	90 40       	sbci	r25, 0x00	; 0
+ 26e:	e1 f7       	brne	.-8      	; 0x268 <servo_init+0x30>
+ 270:	00 c0       	rjmp	.+0      	; 0x272 <servo_init+0x3a>
+ 272:	00 00       	nop
+ 274:	08 95       	ret
+
+00000276 <servo_0_grados>:
+	_delay_ms(500); // Esperar a que el servo se estabilice
+}
+
+void servo_0_grados(void) {
+	// Posición para 0° (aprox. 1ms pulso)
+	OCR1A = 2000; // 2000 counts = 1ms
+ 276:	80 ed       	ldi	r24, 0xD0	; 208
+ 278:	97 e0       	ldi	r25, 0x07	; 7
+ 27a:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f8089>
+ 27e:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f8088>
+ 282:	87 ea       	ldi	r24, 0xA7	; 167
+ 284:	91 e6       	ldi	r25, 0x61	; 97
+ 286:	01 97       	sbiw	r24, 0x01	; 1
+ 288:	f1 f7       	brne	.-4      	; 0x286 <servo_0_grados+0x10>
+ 28a:	00 c0       	rjmp	.+0      	; 0x28c <servo_0_grados+0x16>
+ 28c:	00 00       	nop
+ 28e:	08 95       	ret
+
+00000290 <servo_175_grados>:
+	_delay_ms(100); // Esperar a que el servo alcance la posición
+}
+
+void servo_175_grados(void) {
+	// Posición para 175° (aprox. 2ms pulso)
+	OCR1A = 4000; // 4000 counts = 2ms
+ 290:	80 ea       	ldi	r24, 0xA0	; 160
+ 292:	9f e0       	ldi	r25, 0x0F	; 15
+ 294:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f8089>
+ 298:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f8088>
+ 29c:	87 ea       	ldi	r24, 0xA7	; 167
+ 29e:	91 e6       	ldi	r25, 0x61	; 97
+ 2a0:	01 97       	sbiw	r24, 0x01	; 1
+ 2a2:	f1 f7       	brne	.-4      	; 0x2a0 <servo_175_grados+0x10>
+ 2a4:	00 c0       	rjmp	.+0      	; 0x2a6 <servo_175_grados+0x16>
+ 2a6:	00 00       	nop
+ 2a8:	08 95       	ret
+
+000002aa <__tablejump2__>:
+ 2aa:	ee 0f       	add	r30, r30
+ 2ac:	ff 1f       	adc	r31, r31
+ 2ae:	05 90       	lpm	r0, Z+
+ 2b0:	f4 91       	lpm	r31, Z
+ 2b2:	e0 2d       	mov	r30, r0
+ 2b4:	09 94       	ijmp
+
+000002b6 <_exit>:
+ 2b6:	f8 94       	cli
+
+000002b8 <__stop_program>:
+ 2b8:	ff cf       	rjmp	.-2      	; 0x2b8 <__stop_program>
