@@ -1,0 +1,26 @@
+MAESTRO PINOUT
+
+LCD
+
+/*
+PINOUT
+PD0-PD3: PC0 a PC3
+PD4-PD7: PB0-PB3
+
+RS:PB4
+RW:GND
+E: PB5
+
+VSS: GND
+VDD: 5V
+VEE: POT
+
+K: GND
+A: 5V
+
+*/
+
+SPI:
+
+PC4
+PC5 -> Colocar PULL-UP

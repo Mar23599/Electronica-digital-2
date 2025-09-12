@@ -2,10 +2,10 @@
 #include "AdafruitIO_WiFi.h"
 
 // Configuración WiFi y Adafruit IO
-#define WIFI_SSID "HONOR 70 A"
-#define WIFI_PASS "alejandrito"
+#define WIFI_SSID "A34"
+#define WIFI_PASS "ceu85xeur39ig7u"
 #define IO_USERNAME "Mar23599"
-#define IO_KEY "aio_hNAS73grxKrQihqbjBU8CyZWXmGj"
+#define IO_KEY "aio_mmls808jdv2jybThqXR1zX9DQnoO"
 
 // Configuración de puertos seriales
 #define SERIAL_SENSORES Serial2
